@@ -1,0 +1,9 @@
+streamlit
+pandas
+openpyxl
+requests
+beautifulsoup4
+python-dotenv
+PyMuPDF
+pdfplumber
+rapidfuzz

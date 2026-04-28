@@ -1,0 +1,18 @@
+Resume + target role
+        ↓
+Generate search titles:
+Data Analyst, Healthcare Data Analyst, BI Analyst, Financial Data Analyst
+        ↓
+Search multiple sources
+        ↓
+Extract job cards
+        ↓
+Find original company career page
+        ↓
+Verify URL
+        ↓
+Score resume match
+        ↓
+Remove duplicates / expired / easy apply / staffing / government
+        ↓
+Return top 20

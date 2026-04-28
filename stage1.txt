@@ -1,0 +1,5 @@
+SerpAPI Google Jobs
++ SerpAPI Google Search for direct ATS/company career links
++ multiple query variations
++ dedupe
++ strict verification stays ON

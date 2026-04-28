@@ -1,0 +1,21 @@
+Python + FastAPI
+PyMuPDF/pdfplumber for resume text
+LLM only for structured extraction
+PostgreSQL for storage
+
+Backend: FastAPI, PostgreSQL, Redis, Celery, Playwright, Requests/HTTPX, BeautifulSoup, Pydantic.
+AI: Qwen/Gemini/OpenAI for resume parsing, JD parsing, ATS scoring, title expansion.
+Frontend: Streamlit first for MVP, later Next.js.
+
+/* Rules -
+1. URL opens successfully
+2. Page title contains job/company or ATS job ID
+3. Page has apply button/form
+4. Job is not expired/closed
+5. Location matches user preference
+6. Posted date is within last 7 days
+7. Company name matches source
+8. Not Easy Apply only
+9. Not staffing agency
+10. Not government unless allowed
+*/
