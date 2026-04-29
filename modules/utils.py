@@ -14,6 +14,56 @@ def normalize_text(text: str) -> str:
     return re.sub(r"\s+", " ", str(text)).strip().lower()
 
 
+def is_blocked_seniority_title(title: str) -> bool:
+    title = normalize_text(title)
+    return bool(re.search(r"\b(lead|staff)\b", title))
+
+
+def _extract_experience_candidates(text: str) -> list[int]:
+    text = normalize_text(text)
+    if not text:
+        return []
+    text = re.sub(r"[’']", "", text)
+
+    patterns = [
+        r"\b(\d{1,2})\s*(?:\+|plus)?\s*(?:years?|yrs?)\s+(?:of\s+)?(?:professional\s+)?experience\b",
+        r"\b(?:minimum|min\.?|at\s+least|over|more\s+than)\s+(\d{1,2})\s*(?:\+|plus)?\s*(?:years?|yrs?)\b",
+        r"\b(\d{1,2})\s*(?:\+|plus)?\s*(?:years?|yrs?)\s+(?:in|with|building|developing|working)\b",
+        r"\b(\d{1,2})\s*-\s*\d{1,2}\s*(?:years?|yrs?)\b",
+    ]
+
+    candidates = []
+    for pattern in patterns:
+        for match in re.finditer(pattern, text):
+            years = int(match.group(1))
+            if 0 <= years <= 30:
+                candidates.append(years)
+
+    return candidates
+
+
+def extract_resume_experience_years(resume_text: str) -> int | None:
+    candidates = _extract_experience_candidates(resume_text)
+    return max(candidates) if candidates else None
+
+
+def extract_job_required_experience_years(job_text: str) -> int | None:
+    candidates = _extract_experience_candidates(job_text)
+    return min(candidates) if candidates else None
+
+
+def format_experience_years(years: int | None) -> str:
+    if years is None:
+        return "Not clearly mentioned"
+    return str(years)
+
+
+def job_experience_allowed(required_years: int | None, resume_years: int | None) -> bool:
+    if required_years is None or resume_years is None:
+        return True
+    return required_years <= resume_years
+
+
 def clean_url(url: str) -> str:
     if not url:
         return ""

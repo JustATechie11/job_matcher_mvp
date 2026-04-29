@@ -9,7 +9,15 @@ from modules.job_search import search_jobs
 from modules.job_verifier import verify_job_link
 from modules.ats_scorer import calculate_ats_score
 from modules.exporter import export_jobs_to_excel, export_jobs_to_json
-from modules.utils import is_duplicate_job, current_timestamp
+from modules.utils import (
+    current_timestamp,
+    extract_job_required_experience_years,
+    extract_resume_experience_years,
+    format_experience_years,
+    is_blocked_seniority_title,
+    is_duplicate_job,
+    job_experience_allowed,
+)
 
 load_dotenv()
 
@@ -43,6 +51,9 @@ if "search_diagnostics" not in st.session_state:
 if "resume_text" not in st.session_state:
     st.session_state.resume_text = ""
 
+if "resume_experience_years" not in st.session_state:
+    st.session_state.resume_experience_years = None
+
 
 with st.sidebar:
     st.header("Candidate Details")
@@ -63,19 +74,39 @@ with st.sidebar:
     #st.write("Excludes Staffing & Recruitment Agencies")
 
 
+<<<<<<< HEAD
 def process_jobs(raw_jobs, resume_text, job_role, max_results=TARGET_JOB_COUNT):
+=======
+def process_jobs(raw_jobs, resume_text, job_role, resume_experience_years=None, max_results=TARGET_JOB_COUNT):
+>>>>>>> 2dcb295c38582aaa1ce533c3813c2990a811cf67
     scored_jobs = []
     processed_jobs = []
     diagnostics = {
         "raw_candidates": len(raw_jobs),
         "duplicates": 0,
         "missing_links": 0,
+<<<<<<< HEAD
         "verification_rejected": 0,
         "scored_candidates": 0,
         "below_relevant_score": 0,
     }
 
     for job in raw_jobs:
+=======
+        "blocked_seniority_titles": 0,
+        "experience_rejected": 0,
+        "verification_rejected": 0,
+        "scored_candidates": 0,
+        "below_relevant_score": 0,
+        "resume_experience_years": resume_experience_years,
+    }
+
+    for job in raw_jobs:
+        if is_blocked_seniority_title(job.get("job_role", "")):
+            diagnostics["blocked_seniority_titles"] += 1
+            continue
+
+>>>>>>> 2dcb295c38582aaa1ce533c3813c2990a811cf67
         if is_duplicate_job(job, processed_jobs):
             diagnostics["duplicates"] += 1
             continue
@@ -103,6 +134,24 @@ def process_jobs(raw_jobs, resume_text, job_role, max_results=TARGET_JOB_COUNT):
 
         if verification.get("salary_text"):
             job["salary"] = verification["salary_text"]
+<<<<<<< HEAD
+=======
+
+        experience_text = " ".join(
+            [
+                job.get("job_role", ""),
+                job.get("description", ""),
+                job.get("verified_page_text", ""),
+            ]
+        )
+        required_experience_years = extract_job_required_experience_years(experience_text)
+        job["experience_required"] = format_experience_years(required_experience_years)
+
+        if not job_experience_allowed(required_experience_years, resume_experience_years):
+            processed_jobs.append(job)
+            diagnostics["experience_rejected"] += 1
+            continue
+>>>>>>> 2dcb295c38582aaa1ce533c3813c2990a811cf67
 
         score_result = calculate_ats_score(
             resume_text=resume_text,
@@ -160,6 +209,14 @@ if search_button:
             st.error("Could not extract resume text. Please try another PDF.")
         else:
             st.success("Resume parsed successfully.")
+<<<<<<< HEAD
+=======
+            st.session_state.resume_experience_years = extract_resume_experience_years(st.session_state.resume_text)
+            if st.session_state.resume_experience_years is not None:
+                st.info(f"Detected resume experience: {st.session_state.resume_experience_years} years.")
+            else:
+                st.info("Could not clearly detect resume experience, so experience filtering will only display job requirements.")
+>>>>>>> 2dcb295c38582aaa1ce533c3813c2990a811cf67
             st.session_state.shown_jobs = []
             st.session_state.relevant_jobs = []
             st.session_state.search_diagnostics = {}
@@ -171,6 +228,10 @@ if search_button:
                     raw_jobs=raw_jobs,
                     resume_text=st.session_state.resume_text,
                     job_role=job_role,
+<<<<<<< HEAD
+=======
+                    resume_experience_years=st.session_state.resume_experience_years,
+>>>>>>> 2dcb295c38582aaa1ce533c3813c2990a811cf67
                     max_results=TARGET_JOB_COUNT,
                 )
 
@@ -200,6 +261,10 @@ if st.session_state.verified_jobs:
     preferred_columns = [
         "job_role",
         "company",
+<<<<<<< HEAD
+=======
+        "experience_required",
+>>>>>>> 2dcb295c38582aaa1ce533c3813c2990a811cf67
         "ats_score",
         "platform",
         "location",
@@ -225,6 +290,10 @@ if st.session_state.relevant_jobs:
     preferred_columns = [
         "job_role",
         "company",
+<<<<<<< HEAD
+=======
+        "experience_required",
+>>>>>>> 2dcb295c38582aaa1ce533c3813c2990a811cf67
         "ats_score",
         "platform",
         "location",

@@ -4,6 +4,10 @@ from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 import requests
 from dotenv import load_dotenv
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+from modules.ats_extractors import enhance_job_with_ats_api
+from modules.utils import is_blocked_seniority_title
 
 load_dotenv()
 
@@ -221,6 +225,12 @@ def is_blocked_job(job: dict) -> bool:
 
 
 def title_matches_role(title: str, target_role: str, minimum_overlap: float = 0.45) -> bool:
+<<<<<<< HEAD
+=======
+    if is_blocked_seniority_title(title):
+        return False
+
+>>>>>>> 2dcb295c38582aaa1ce533c3813c2990a811cf67
     ignored = {"and", "the", "for", "with", "remote", "usa", "united", "states"}
     title_words = {
         word for word in re.findall(r"[a-z0-9+#]+", normalize(title))
@@ -643,5 +653,24 @@ def search_jobs(job_role: str, location: str, limit: int = 50) -> list[dict]:
 
     all_jobs = dedupe_jobs(all_jobs)
     print("Total raw unique jobs:", len(all_jobs))
+    
+    final_candidates = all_jobs[:candidate_limit]
+    print("Enhancing jobs with official ATS developer APIs...")
+    
+    enhanced_jobs = []
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        future_to_job = {executor.submit(enhance_job_with_ats_api, job): job for job in final_candidates}
+        for future in as_completed(future_to_job):
+            try:
+                enhanced_job = future.result()
+            except Exception as e:
+                enhanced_job = future_to_job[future]
 
+<<<<<<< HEAD
     return all_jobs[:candidate_limit]
+=======
+            if title_matches_role(enhanced_job.get("job_role", ""), job_role, minimum_overlap=0.34):
+                enhanced_jobs.append(enhanced_job)
+                
+    return enhanced_jobs
+>>>>>>> 2dcb295c38582aaa1ce533c3813c2990a811cf67
